@@ -41,9 +41,9 @@ const COLORS = {
   pipeBorder: "#3d7a26",
   pipeLight: "#7fcf4f",
   pipeDark: "#3d7a26",
-  ground: "#ded895",
-  groundBorder: "#c4a86a",
-  groundLine: "#c4a86a",
+  ground: "#8B5E3C",
+  groundBorder: "#6B4423",
+  groundLine: "#A0735A",
   text: "#ffffff",
   textShadow: "#1a1a1a",
 };
@@ -228,23 +228,30 @@ function drawScore(ctx: CanvasRenderingContext2D, score: number) {
 }
 
 // ─── Colisiones ─────────────────────────────────────────────────────
+// Colisión círculo (pájaro) vs rectángulo (tubería)
+function circleRectCollide(cx: number, cy: number, r: number, rx: number, ry: number, rw: number, rh: number): boolean {
+  const closestX = Math.max(rx, Math.min(cx, rx + rw));
+  const closestY = Math.max(ry, Math.min(cy, ry + rh));
+  const dx = cx - closestX;
+  const dy = cy - closestY;
+  return (dx * dx + dy * dy) < r * r;
+}
+
 function checkCollision(bird: Bird, pipes: Pipe[]): boolean {
   // Techo
   if (bird.y - BIRD_R <= 0) return true;
   // Suelo
   if (bird.y + BIRD_R >= GROUND_Y) return true;
 
-  // Tuberías: usar bounding box del pájaro (más justo que círculo)
-  const bx1 = BIRD_X - BIRD_W / 2 + 2;
-  const bx2 = BIRD_X + BIRD_W / 2 - 2;
-  const by1 = bird.y - BIRD_H / 2 + 2;
-  const by2 = bird.y + BIRD_H / 2 - 2;
-
+  // Tuberías: colisión círculo del pájaro (BIRD_R) vs rectángulo de cada tubería
   for (const pipe of pipes) {
-    if (bx2 < pipe.x || bx1 > pipe.x + PIPE_W) continue;
     const gapTop = pipe.gapY - PIPE_GAP / 2;
     const gapBottom = pipe.gapY + PIPE_GAP / 2;
-    if (by1 < gapTop || by2 > gapBottom) return true;
+
+    // Tubería superior: rectángulo de (0,0) a (PIPE_W, gapTop)
+    if (circleRectCollide(BIRD_X, bird.y, BIRD_R, pipe.x, 0, PIPE_W, gapTop)) return true;
+    // Tubería inferior: rectángulo de (gapBottom, GROUND_Y) con altura (GROUND_Y - gapBottom)
+    if (circleRectCollide(BIRD_X, bird.y, BIRD_R, pipe.x, gapBottom, PIPE_W, GROUND_Y - gapBottom)) return true;
   }
   return false;
 }
@@ -255,14 +262,13 @@ export default function FlappyBirdGame() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const gameRef = useRef<GameRef>(initialState());
   const rafRef = useRef<number>(0);
-  const readyRef = useRef<boolean>(false);
+  const bestScoreRef = useRef<number>(0);
 
   const [uiState, setUiState] = useState<GameState>("READY");
   const [uiScore, setUiScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);
   const [canvasSupported, setCanvasSupported] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Cargar bestScore de localStorage
   useEffect(() => {
@@ -270,16 +276,17 @@ export default function FlappyBirdGame() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const n = parseInt(stored, 10);
-        if (!isNaN(n) && n >= 0) setBestScore(n);
+        if (!isNaN(n) && n >= 0) {
+          setBestScore(n);
+          bestScoreRef.current = n;
+        }
       }
     } catch {
       // localStorage no disponible (modo privado) → bestScore = 0
     }
-    readyRef.current = true;
-    setIsLoading(false);
   }, []);
 
-  // Inicializar canvas
+  // Inicializar canvas y game loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -290,13 +297,6 @@ export default function FlappyBirdGame() {
     }
     ctx.imageSmoothingEnabled = false;
     ctxRef.current = ctx;
-  }, []);
-
-  // Game loop
-  useEffect(() => {
-    const ctx = ctxRef.current;
-    const canvas = canvasRef.current;
-    if (!ctx || !canvas) return;
 
     const loop = () => {
       const g = gameRef.current;
@@ -347,7 +347,8 @@ export default function FlappyBirdGame() {
           setUiState("GAME_OVER");
 
           // Actualizar bestScore
-          if (g.score > bestScore) {
+          if (g.score > bestScoreRef.current) {
+            bestScoreRef.current = g.score;
             setBestScore(g.score);
             setIsNewRecord(true);
             try {
@@ -387,7 +388,7 @@ export default function FlappyBirdGame() {
 
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [bestScore]);
+  }, []);
 
   // ─── Acciones ──
   const flap = useCallback(() => {
@@ -469,16 +470,6 @@ export default function FlappyBirdGame() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="flappy-canvas-wrap">
-        <p className="flappy-loading" role="status" aria-live="polite">
-          Cargando partida…
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="flappy-canvas-wrap">
       <canvas
@@ -510,9 +501,9 @@ export default function FlappyBirdGame() {
           onMouseDown={handlePointer}
           onTouchStart={handlePointer}
         >
-          <h2 id="flappy-title">Flappy Bird</h2>
+          <h2 id="flappy-title">FLAPPY BIRD</h2>
           <p id="flappy-hint" className="flappy-hint">
-            Pulsa Espacio o toca para empezar. También puedes usar el botón Comenzar.
+            Press Space / Tap to Start
           </p>
           {bestScore > 0 && (
             <p className="flappy-record">Tu récord: {bestScore} puntos</p>
@@ -547,7 +538,7 @@ export default function FlappyBirdGame() {
           aria-describedby="go-summary"
         >
           <div className="flappy-card">
-            <h2 id="go-title">Fin de la partida</h2>
+            <h2 id="go-title">GAME OVER</h2>
             {isNewRecord && (
               <span className="flappy-new-record" role="status" aria-live="polite">
                 ¡Nuevo récord!
@@ -564,7 +555,7 @@ export default function FlappyBirdGame() {
               </div>
             </div>
             <p id="go-summary" className="sr-only">
-              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa Reintentar para jugar otra vez. También puedes pulsar Espacio para reiniciar.
+              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa RETRY para jugar otra vez. También puedes pulsar Espacio para reiniciar.
             </p>
             <button
               ref={retryBtnRef}
@@ -582,7 +573,7 @@ export default function FlappyBirdGame() {
                 }
               }}
             >
-              Reintentar
+              RETRY
             </button>
           </div>
         </div>
