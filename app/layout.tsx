@@ -6,6 +6,14 @@ export const metadata = {
   description: "Salta, esquiva tuberías y consigue la mejor marca",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#70c5ce",
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">

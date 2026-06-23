@@ -221,9 +221,9 @@ function drawScore(ctx: CanvasRenderingContext2D, score: number) {
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillStyle = COLORS.textShadow;
-  ctx.fillText(String(score), CANVAS_W / 2 + 2, 32);
+  ctx.fillText(`Puntos: ${score}`, CANVAS_W / 2 + 2, 32);
   ctx.fillStyle = COLORS.text;
-  ctx.fillText(String(score), CANVAS_W / 2, 30);
+  ctx.fillText(`Puntos: ${score}`, CANVAS_W / 2, 30);
   ctx.restore();
 }
 
@@ -262,6 +262,7 @@ export default function FlappyBirdGame() {
   const [bestScore, setBestScore] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);
   const [canvasSupported, setCanvasSupported] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Cargar bestScore de localStorage
   useEffect(() => {
@@ -275,6 +276,7 @@ export default function FlappyBirdGame() {
       // localStorage no disponible (modo privado) → bestScore = 0
     }
     readyRef.current = true;
+    setIsLoading(false);
   }, []);
 
   // Inicializar canvas
@@ -445,9 +447,13 @@ export default function FlappyBirdGame() {
 
   // ─── Auto-focus del botón retry ──
   const retryBtnRef = useRef<HTMLButtonElement>(null);
+  const startBtnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (uiState === "GAME_OVER" && retryBtnRef.current) {
       retryBtnRef.current.focus();
+    }
+    if (uiState === "READY" && startBtnRef.current) {
+      startBtnRef.current.focus();
     }
   }, [uiState]);
 
@@ -456,6 +462,16 @@ export default function FlappyBirdGame() {
       <div className="flappy-canvas-wrap">
         <p className="flappy-no-canvas">
           Tu navegador no soporta Canvas. Prueba con otro navegador.
+        </p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flappy-canvas-wrap">
+        <p className="flappy-loading" role="status" aria-live="polite">
+          Cargando partida…
         </p>
       </div>
     );
@@ -474,7 +490,14 @@ export default function FlappyBirdGame() {
 
       {/* Overlay READY */}
       {uiState === "READY" && (
-        <div className="flappy-overlay" role="dialog" aria-labelledby="flappy-title" aria-describedby="flappy-hint">
+        <div
+          className="flappy-overlay"
+          role="dialog"
+          aria-labelledby="flappy-title"
+          aria-describedby="flappy-hint"
+          onMouseDown={handlePointer}
+          onTouchStart={handlePointer}
+        >
           <h1 id="flappy-title">FLAPPY BIRD</h1>
           <p className="flappy-hint" id="flappy-hint">
             Presiona Espacio o toca la pantalla para empezar
@@ -483,9 +506,9 @@ export default function FlappyBirdGame() {
             <p className="flappy-record">Tu récord: {bestScore} puntos</p>
           )}
           <button
+            ref={startBtnRef}
             className="sr-only"
             onClick={flap}
-            aria-label="Comenzar partida"
           >
             Comenzar partida
           </button>
@@ -498,7 +521,7 @@ export default function FlappyBirdGame() {
           <div className="flappy-card">
             <h2 id="go-title">Fin de la partida</h2>
             {isNewRecord && (
-              <span className="flappy-new-record" role="status" aria-label="Nuevo récord">
+              <span className="flappy-new-record" role="status">
                 ¡Nuevo récord!
               </span>
             )}

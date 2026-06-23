@@ -204,7 +204,6 @@ body {
   background: var(--retro-sky);
   font-family: var(--retro-font);
   -webkit-font-smoothing: none;
-  font-smooth: never;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
