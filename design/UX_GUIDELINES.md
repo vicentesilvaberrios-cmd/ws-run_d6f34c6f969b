@@ -49,3 +49,9 @@ Toda vista que carga datos debe contemplar y mostrar:
 - Formularios validan en cliente y muestran errores junto al campo.
 - Navegación clara y consistente vía `.navbar`; el usuario siempre sabe dónde está y cómo volver.
 - Jerarquía visual: un `h1` por pantalla con título claro del dominio.
+
+## 7. Nombres de marca
+- Los nombres de marca comerciales o juegos (ej. "Flappy Bird") pueden conservar su
+  idioma original por reconocimiento, pero deben escribirse con capitalización normal
+  ("Flappy Bird"), no en mayúsculas sostenidas. El resto del texto de la interfaz
+  permanece en español.

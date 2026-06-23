@@ -253,19 +253,11 @@ html, body {
   text-align: center;
 }
 
-.flappy-overlay h1,
 .flappy-overlay h2 {
   color: #ffffff;
   font-family: var(--retro-font);
   text-shadow: 2px 2px 0 #1a1a1a;
   line-height: 1.4;
-}
-
-.flappy-overlay h1 {
-  font-size: clamp(1.25rem, 5vw, 2rem);
-}
-
-.flappy-overlay h2 {
   font-size: clamp(1rem, 4vw, 1.5rem);
 }
 
@@ -327,7 +319,9 @@ html, body {
   font-size: clamp(0.45rem, 1.5vw, 0.6rem);
 }
 
-/* Botón retro pixel-art */
+/* Botón retro pixel-art (Comenzar y Reintentar) */
+.btn-retro,
+.btn-start,
 .btn-retry {
   font-family: var(--retro-font);
   font-size: clamp(0.6rem, 2.5vw, 0.8rem);
@@ -344,47 +338,22 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
+.btn-retro:hover,
+.btn-start:hover,
 .btn-retry:hover {
   background: #ffe54a;
 }
 
+.btn-retro:active,
+.btn-start:active,
 .btn-retry:active {
   transform: translate(4px, 4px);
   box-shadow: 0 0 0 #1a1a1a;
 }
 
+.btn-retro:focus-visible,
+.btn-start:focus-visible,
 .btn-retry:focus-visible {
-  outline: 3px solid #ffffff;
-  outline-offset: 2px;
-}
-
-/* Botón Comenzar (mismo estilo retro que Reintentar) */
-.btn-start {
-  font-family: var(--retro-font);
-  font-size: clamp(0.6rem, 2.5vw, 0.8rem);
-  color: #1a1a1a;
-  background: var(--retro-bird);
-  border: 3px solid #1a1a1a;
-  border-radius: 0;
-  padding: var(--sp-3) var(--sp-5);
-  cursor: pointer;
-  min-height: 44px;
-  min-width: 160px;
-  box-shadow: 4px 4px 0 #1a1a1a;
-  transition: transform 0.05s, box-shadow 0.05s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn-start:hover {
-  background: #ffe54a;
-}
-
-.btn-start:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 #1a1a1a;
-}
-
-.btn-start:focus-visible {
   outline: 3px solid #ffffff;
   outline-offset: 2px;
 }

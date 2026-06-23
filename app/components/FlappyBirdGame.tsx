@@ -456,6 +456,9 @@ export default function FlappyBirdGame() {
     }
   }, [uiState]);
 
+  // Guard para evitar doble disparo (pointerdown + click sintético)
+  const suppressClickRef = useRef(false);
+
   if (!canvasSupported) {
     return (
       <div className="flappy-canvas-wrap">
@@ -482,17 +485,20 @@ export default function FlappyBirdGame() {
         ref={canvasRef}
         width={CANVAS_W}
         height={CANVAS_H}
+        role="application"
         onMouseDown={handlePointer}
         onTouchStart={handlePointer}
-        aria-label="Área de juego de Flappy Bird"
+        aria-label="Área de juego Flappy Bird. Pulsa Espacio, haz clic o toca para que el pájaro salte"
       />
 
-      {/* HUD accesible: anuncia puntos a lectores de pantalla */}
-      {uiState === "PLAYING" && (
-        <span aria-live="polite" className="sr-only">
-          {uiScore} puntos
-        </span>
-      )}
+      {/* HUD accesible: anuncia puntos y récord a lectores de pantalla en todo momento */}
+      <span aria-live="polite" className="sr-only">
+        {uiState === "PLAYING" || uiState === "GAME_OVER"
+          ? `Puntos: ${uiScore}. Tu récord: ${bestScore} puntos.`
+          : uiState === "READY" && bestScore > 0
+            ? `Tu récord: ${bestScore} puntos.`
+            : ""}
+      </span>
 
       {/* Overlay READY */}
       {uiState === "READY" && (
@@ -504,20 +510,20 @@ export default function FlappyBirdGame() {
           onMouseDown={handlePointer}
           onTouchStart={handlePointer}
         >
-          <h1 id="flappy-title">FLAPPY BIRD</h1>
-          <p className="flappy-hint" aria-hidden="true">
-            Pulsa Espacio o toca para empezar
-          </p>
-          <p id="flappy-hint" className="sr-only">
+          <h2 id="flappy-title">Flappy Bird</h2>
+          <p id="flappy-hint" className="flappy-hint">
             Pulsa Espacio o toca para empezar. También puedes usar el botón Comenzar.
           </p>
           {bestScore > 0 && (
             <p className="flappy-record">Tu récord: {bestScore} puntos</p>
           )}
           <button
-            className="btn btn-start"
-            onClick={flap}
-            onTouchStart={(e) => { e.preventDefault(); flap(); }}
+            className="btn-start"
+            onPointerDown={(e) => { e.preventDefault(); suppressClickRef.current = true; flap(); }}
+            onClick={() => {
+              if (suppressClickRef.current) { suppressClickRef.current = false; return; }
+              flap();
+            }}
             onKeyDown={(e) => {
               if (e.code === "Space" || e.code === "Enter") {
                 e.preventDefault();
@@ -539,13 +545,6 @@ export default function FlappyBirdGame() {
           aria-modal="true"
           aria-labelledby="go-title"
           aria-describedby="go-summary"
-          onKeyDown={(e) => {
-            // Focus trap: mantener el foco dentro del diálogo
-            if (e.key === "Tab") {
-              e.preventDefault();
-              retryBtnRef.current?.focus();
-            }
-          }}
         >
           <div className="flappy-card">
             <h2 id="go-title">Fin de la partida</h2>
@@ -565,13 +564,16 @@ export default function FlappyBirdGame() {
               </div>
             </div>
             <p id="go-summary" className="sr-only">
-              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa Reintentar para jugar otra vez.
+              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa Reintentar para jugar otra vez. También puedes pulsar Espacio para reiniciar.
             </p>
             <button
               ref={retryBtnRef}
-              className="btn btn-retry"
-              onClick={reset}
-              onTouchStart={(e) => { e.preventDefault(); reset(); }}
+              className="btn-retry"
+              onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); suppressClickRef.current = true; reset(); }}
+              onClick={() => {
+                if (suppressClickRef.current) { suppressClickRef.current = false; return; }
+                reset();
+              }}
               onKeyDown={(e) => {
                 if (e.code === "Space" || e.code === "Enter") {
                   e.preventDefault();
