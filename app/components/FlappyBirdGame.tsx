@@ -378,7 +378,7 @@ export default function FlappyBirdGame() {
 
       drawBird(ctx, g.bird);
 
-      if (g.state === "PLAYING") {
+      if (g.state === "PLAYING" || g.state === "GAME_OVER") {
         drawScore(ctx, g.score);
       }
 
@@ -506,7 +506,7 @@ export default function FlappyBirdGame() {
         >
           <h1 id="flappy-title">FLAPPY BIRD</h1>
           <p className="flappy-hint" id="flappy-hint">
-            Presiona Espacio o toca la pantalla para empezar
+            Press Space / Tap to Start
           </p>
           {bestScore > 0 && (
             <p className="flappy-record">Tu récord: {bestScore} puntos</p>
@@ -531,7 +531,7 @@ export default function FlappyBirdGame() {
           }}
         >
           <div className="flappy-card">
-            <h2 id="go-title">Fin de la partida</h2>
+            <h2 id="go-title">GAME OVER</h2>
             {isNewRecord && (
               <span className="flappy-new-record" role="status" aria-live="polite">
                 ¡Nuevo récord!
@@ -548,7 +548,7 @@ export default function FlappyBirdGame() {
               </div>
             </div>
             <p id="go-summary" className="sr-only">
-              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa Volver a jugar para reiniciar.
+              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa RETRY para reiniciar.
             </p>
             <button
               ref={retryBtnRef}
@@ -563,7 +563,7 @@ export default function FlappyBirdGame() {
                 }
               }}
             >
-              Volver a jugar
+              RETRY
             </button>
           </div>
         </div>
