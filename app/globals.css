@@ -177,3 +177,235 @@ h3 { font-size: var(--fs-xl); }
 .gap-2 { gap: var(--sp-2); } .gap-4 { gap: var(--sp-4); }
 .mt-4 { margin-top: var(--sp-4); } .w-full { width: 100%; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* =====================================================================
+ * FLAPPY BIRD — estilos retro (pixel-art)
+ * ===================================================================== */
+
+:root {
+  --retro-sky: #70c5ce;
+  --retro-pipe: #5fa83d;
+  --retro-pipe-border: #3d7a26;
+  --retro-bird: #ffdf00;
+  --retro-bird-border: #1a1a1a;
+  --retro-ground: #ded895;
+  --retro-ground-border: #c4a86a;
+  --retro-font: "Press Start 2P", monospace;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--retro-sky);
+  font-family: var(--retro-font);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Escenario: ocupa todo el viewport y centra el canvas */
+.flappy-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--retro-sky);
+  position: relative;
+}
+
+/* Contenedor del canvas con relación de aspecto fija */
+.flappy-canvas-wrap {
+  position: relative;
+  height: 100%;
+  max-height: 100dvh;
+  aspect-ratio: 400 / 600;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flappy-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  touch-action: none;
+}
+
+/* Overlays (pantallas de inicio / fin) */
+.flappy-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10;
+  padding: var(--sp-4);
+  text-align: center;
+}
+
+.flappy-overlay h1,
+.flappy-overlay h2 {
+  color: #ffffff;
+  font-family: var(--retro-font);
+  text-shadow: 2px 2px 0 #1a1a1a;
+  line-height: 1.4;
+}
+
+.flappy-overlay h1 {
+  font-size: clamp(1.25rem, 5vw, 2rem);
+}
+
+.flappy-overlay h2 {
+  font-size: clamp(1rem, 4vw, 1.5rem);
+}
+
+.flappy-hint {
+  color: #ffffff;
+  font-family: var(--retro-font);
+  font-size: clamp(0.5rem, 2vw, 0.75rem);
+  line-height: 1.8;
+  text-shadow: 1px 1px 0 #1a1a1a;
+  animation: flappy-blink 1.2s steps(2, start) infinite;
+}
+
+.flappy-record {
+  color: var(--retro-bird);
+  font-family: var(--retro-font);
+  font-size: clamp(0.5rem, 2vw, 0.7rem);
+  text-shadow: 1px 1px 0 #1a1a1a;
+}
+
+/* Tarjeta retro dentro del overlay */
+.flappy-card {
+  background: rgba(23, 28, 35, 0.92);
+  border: 3px solid #ffffff;
+  border-radius: 0;
+  padding: var(--sp-5) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  max-width: 90%;
+  box-shadow: 0 0 0 3px #1a1a1a, 4px 4px 0 3px rgba(0,0,0,0.3);
+}
+
+.flappy-kpis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  align-items: center;
+}
+
+.flappy-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.flappy-kpi .value {
+  color: #ffffff;
+  font-family: var(--retro-font);
+  font-size: clamp(0.7rem, 3vw, 1rem);
+  font-weight: 700;
+}
+
+.flappy-kpi .label {
+  color: var(--retro-bird);
+  font-family: var(--retro-font);
+  font-size: clamp(0.45rem, 1.5vw, 0.6rem);
+}
+
+/* Botón retro pixel-art */
+.btn-retry {
+  font-family: var(--retro-font);
+  font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+  color: #1a1a1a;
+  background: var(--retro-bird);
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  padding: var(--sp-3) var(--sp-5);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 160px;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  transition: transform 0.05s, box-shadow 0.05s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-retry:hover {
+  background: #ffe54a;
+}
+
+.btn-retry:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+
+.btn-retry:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Badge nuevo récord */
+.flappy-new-record {
+  color: #1a1a1a;
+  background: var(--retro-bird);
+  font-family: var(--retro-font);
+  font-size: clamp(0.5rem, 2vw, 0.65rem);
+  padding: var(--sp-1) var(--sp-3);
+  border: 2px solid #1a1a1a;
+  border-radius: 0;
+  animation: flappy-blink 0.8s steps(2, start) infinite;
+}
+
+/* Parpadeo */
+@keyframes flappy-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* Cargando */
+.flappy-loading {
+  color: #ffffff;
+  font-family: var(--retro-font);
+  font-size: 0.6rem;
+  text-shadow: 1px 1px 0 #1a1a1a;
+}
+
+/* Sin canvas */
+.flappy-no-canvas {
+  color: #ffffff;
+  font-family: var(--retro-font);
+  font-size: 0.6rem;
+  text-align: center;
+  padding: var(--sp-5);
+  line-height: 1.8;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .flappy-hint,
+  .flappy-new-record {
+    animation: none;
+  }
+}
