@@ -195,22 +195,10 @@ h3 { font-size: var(--fs-xl); }
 
 html, body {
   height: 100%;
-  overflow: hidden;
   margin: 0;
   padding: 0;
 }
 
-body {
-  background: var(--retro-sky);
-  font-family: var(--retro-font);
-  -webkit-font-smoothing: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Escenario: ocupa todo el viewport y centra el canvas */
 .flappy-stage {
   display: flex;
   align-items: center;
@@ -220,6 +208,12 @@ body {
   overflow: hidden;
   background: var(--retro-sky);
   position: relative;
+  font-family: var(--retro-font);
+  -webkit-font-smoothing: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Contenedor del canvas con relación de aspecto fija */

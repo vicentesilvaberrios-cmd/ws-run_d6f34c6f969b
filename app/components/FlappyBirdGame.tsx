@@ -419,6 +419,9 @@ export default function FlappyBirdGame() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.code === "Space") {
+        // Si el foco está en un botón, dejar que su propio onKeyDown lo maneje
+        const target = e.target as HTMLElement;
+        if (target && target.tagName === "BUTTON") return;
         e.preventDefault();
         if (e.repeat) return;
         const g = gameRef.current;
@@ -447,13 +450,9 @@ export default function FlappyBirdGame() {
 
   // ─── Auto-focus del botón retry ──
   const retryBtnRef = useRef<HTMLButtonElement>(null);
-  const startBtnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (uiState === "GAME_OVER" && retryBtnRef.current) {
       retryBtnRef.current.focus();
-    }
-    if (uiState === "READY" && startBtnRef.current) {
-      startBtnRef.current.focus();
     }
   }, [uiState]);
 
@@ -488,6 +487,13 @@ export default function FlappyBirdGame() {
         aria-label="Área de juego de Flappy Bird"
       />
 
+      {/* HUD accesible: anuncia puntos a lectores de pantalla */}
+      {uiState === "PLAYING" && (
+        <span aria-live="polite" className="sr-only">
+          {uiScore} puntos
+        </span>
+      )}
+
       {/* Overlay READY */}
       {uiState === "READY" && (
         <div
@@ -505,23 +511,29 @@ export default function FlappyBirdGame() {
           {bestScore > 0 && (
             <p className="flappy-record">Tu récord: {bestScore} puntos</p>
           )}
-          <button
-            ref={startBtnRef}
-            className="sr-only"
-            onClick={flap}
-          >
-            Comenzar partida
-          </button>
         </div>
       )}
 
       {/* Overlay GAME_OVER */}
       {uiState === "GAME_OVER" && (
-        <div className="flappy-overlay" role="dialog" aria-modal="true" aria-labelledby="go-title" aria-describedby="go-summary">
+        <div
+          className="flappy-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="go-title"
+          aria-describedby="go-summary"
+          onKeyDown={(e) => {
+            // Focus trap: mantener el foco dentro del diálogo
+            if (e.key === "Tab") {
+              e.preventDefault();
+              retryBtnRef.current?.focus();
+            }
+          }}
+        >
           <div className="flappy-card">
             <h2 id="go-title">Fin de la partida</h2>
             {isNewRecord && (
-              <span className="flappy-new-record" role="status">
+              <span className="flappy-new-record" role="status" aria-live="polite">
                 ¡Nuevo récord!
               </span>
             )}
@@ -540,7 +552,7 @@ export default function FlappyBirdGame() {
             </p>
             <button
               ref={retryBtnRef}
-              className="btn-retry"
+              className="btn btn-retry"
               onClick={reset}
               onTouchStart={(e) => { e.preventDefault(); reset(); }}
               onKeyDown={(e) => {
