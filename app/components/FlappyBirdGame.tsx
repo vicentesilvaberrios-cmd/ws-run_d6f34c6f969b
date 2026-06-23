@@ -505,12 +505,29 @@ export default function FlappyBirdGame() {
           onTouchStart={handlePointer}
         >
           <h1 id="flappy-title">FLAPPY BIRD</h1>
-          <p className="flappy-hint" id="flappy-hint">
-            Press Space / Tap to Start
+          <p className="flappy-hint" aria-hidden="true">
+            Pulsa Espacio o toca para empezar
+          </p>
+          <p id="flappy-hint" className="sr-only">
+            Pulsa Espacio o toca para empezar. También puedes usar el botón Comenzar.
           </p>
           {bestScore > 0 && (
             <p className="flappy-record">Tu récord: {bestScore} puntos</p>
           )}
+          <button
+            className="btn btn-start"
+            onClick={flap}
+            onTouchStart={(e) => { e.preventDefault(); flap(); }}
+            onKeyDown={(e) => {
+              if (e.code === "Space" || e.code === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                flap();
+              }
+            }}
+          >
+            Comenzar
+          </button>
         </div>
       )}
 
@@ -531,7 +548,7 @@ export default function FlappyBirdGame() {
           }}
         >
           <div className="flappy-card">
-            <h2 id="go-title">GAME OVER</h2>
+            <h2 id="go-title">Fin de la partida</h2>
             {isNewRecord && (
               <span className="flappy-new-record" role="status" aria-live="polite">
                 ¡Nuevo récord!
@@ -548,7 +565,7 @@ export default function FlappyBirdGame() {
               </div>
             </div>
             <p id="go-summary" className="sr-only">
-              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa RETRY para reiniciar.
+              Has conseguido {uiScore} puntos. Tu mejor marca es {bestScore}. Pulsa Reintentar para jugar otra vez.
             </p>
             <button
               ref={retryBtnRef}
@@ -563,7 +580,7 @@ export default function FlappyBirdGame() {
                 }
               }}
             >
-              RETRY
+              Reintentar
             </button>
           </div>
         </div>

@@ -358,6 +358,37 @@ html, body {
   outline-offset: 2px;
 }
 
+/* Botón Comenzar (mismo estilo retro que Reintentar) */
+.btn-start {
+  font-family: var(--retro-font);
+  font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+  color: #1a1a1a;
+  background: var(--retro-bird);
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  padding: var(--sp-3) var(--sp-5);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 160px;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  transition: transform 0.05s, box-shadow 0.05s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-start:hover {
+  background: #ffe54a;
+}
+
+.btn-start:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+
+.btn-start:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
 /* Badge nuevo récord */
 .flappy-new-record {
   color: #1a1a1a;
