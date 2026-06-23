@@ -1,0 +1,32 @@
+{
+  "backend": [
+    "No requiere backend. El juego corre 100% en el cliente (Canvas + Next.js App Router + TypeScript). Sin migraciones, sin endpoints API, sin base de datos."
+  ],
+  "frontend": [
+    "app/layout.tsx: layout raíz con metadata, importación de fuente 'Press Start 2P' (Google Fonts) y fallback monospace, fondo retro centrado, sin scroll vertical (overflow hidden).",
+    "app/page.tsx: página única en ruta '/' que renderiza <FlappyBirdGame/> centrado en el viewport. Importa el componente cliente.",
+    "app/components/FlappyBirdGame.tsx: componente cliente ('use client') con toda la lógica del juego. Incluye: useRef para canvas y estado de juego (bird, pipes, score, bestScore, gameState, frame), game loop con requestAnimationFrame, gestión de estados READY/PLAYING/GAME_OVER, función reset(), físicas del pájaro (gravedad, flap, rotación según velocity), generación y desplazamiento de tuberías con gap aleatorio, colisión bird-vs-tubería/suelo/techo, suelo con scroll horizontal, marcador de puntos, persistencia de bestScore en localStorage ('flappy_best_score'), inputs (keydown Space, click, touchstart) con preventDefault en Space, escalado responsivo del canvas (400×600 interno con CSS aspect-ratio), render retro (imageSmoothingEnabled=false, paleta pixel-art, bordes pixelados), pantalla de inicio ('FLAPPY BIRD' + 'Press Space / Tap to Start'), pantalla de Game Over ('GAME OVER' + score + bestScore + botón 'RETRY').",
+    "app/globals.css: estilos globales retro: body sin margin/overflow hidden, fondo oscuro o cielo, tipografía monospace, centrado del canvas, reglas de escalado responsivo (height: 100%, max-width: 100%, aspect-ratio 400/600), clases para overlay de textos y botón RETRY con estilo pixel-art."
+  ],
+  "acceptance_criteria": [
+    "Al cargar la página '/', el canvas se renderiza con el loop de animación activo y el juego arranca en estado READY mostrando 'FLAPPY BIRD' y 'Press Space / Tap to Start'.",
+    "reset() restablece score=0, pipes=[], bird en posición inicial y gameState cambia correctamente.",
+    "El pájaro cae por gravedad de forma continua cada frame y sube inmediatamente al presionar Space, click o touch (velocity negativa).",
+    "Si el pájaro toca el techo (y - radius <= 0) o el suelo, el estado pasa a GAME_OVER.",
+    "El pájaro rota visualmente según su velocity (arriba al subir, abajo al caer).",
+    "Los pares de tuberías aparecen periódicamente desde el borde derecho con huecos a alturas aleatorias distintas entre pares.",
+    "Las tuberías se desplazan hacia la izquierda a velocidad constante y se eliminan del array al salir del borde izquierdo.",
+    "Si el círculo del pájaro intersecta la tubería superior o inferior de cualquier par, el estado pasa a GAME_OVER.",
+    "El suelo se dibuja como rectángulo marrón con scroll horizontal animado.",
+    "El marcador empieza en 0, se muestra durante PLAYING y GAME_OVER, e incrementa +1 al pasar el centro de un par de tuberías sin colisión.",
+    "bestScore se lee de localStorage ('flappy_best_score') al montar el componente y se actualiza si score > bestScore al pasar a GAME_OVER.",
+    "En la pantalla de Game Over se muestra 'GAME OVER', score actual, bestScore y un botón 'RETRY' que reinicia el juego.",
+    "En escritorio, Space (keydown con preventDefault, sin repetición), click del mouse en el canvas; en móvil, touchstart en el canvas — todos disparan flap.",
+    "En READY, cualquier input arranca el juego y ejecuta un flap inicial.",
+    "El canvas escala responsivamente sin deformar la relación de aspecto (400×600).",
+    "La paleta de colores es retro: cielo azul, tuberías verdes pixeladas, pájaro amarillo con borde negro, suelo marrón.",
+    "La tipografía del marcador y textos es monoespaciada/pixel ('Press Start 2P' o monospace).",
+    "imageSmoothingEnabled = false y bordes pixelados visibles en el render.",
+    "next debe estar en versión ^14.2.35 o superior en package.json para evitar CVEs que bloquean el deploy en Railway."
+  ]
+}
